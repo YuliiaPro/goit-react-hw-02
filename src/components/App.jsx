@@ -13,14 +13,7 @@ const getFeedback = () => {
 };
 
 export default function App() {
-  const [feedback, setFeedback] = useState(getFeedback());
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    localStorage.setItem("saved-feedbacks", JSON.stringify(feedback));
-    setIsVisible(feedback.good + feedback.neutral + feedback.bad > 0);
-    return () => {};
-  }, [feedback]);
+  const [feedback, setFeedback] = useState(getFeedback);
 
   const updateFeedback = (feedbackType) => {
     setFeedback((feedbacks) => ({
@@ -28,8 +21,6 @@ export default function App() {
       [feedbackType]: feedbacks[feedbackType] + 1,
     }));
   };
-  const totalFeedback = feedback.good + feedback.neutral + feedback.bad;
-  const positiveFeedback = Math.round((feedback.good / totalFeedback) * 100);
 
   const handleReset = () => {
     setFeedback({
@@ -38,6 +29,14 @@ export default function App() {
       bad: 0,
     });
   };
+
+  useEffect(() => {
+    localStorage.setItem("saved-feedback", JSON.stringify(feedback));
+    return () => {};
+  }, [feedback]);
+
+  const totalFeedback = feedback.good + feedback.neutral + feedback.bad;
+  const positiveFeedback = Math.round((feedback.good / totalFeedback) * 100);
 
   return (
     <div className={css.container}>
@@ -48,7 +47,7 @@ export default function App() {
         handleReset={handleReset}
       />
 
-      {isVisible ? (
+      {totalFeedback > 0 ? (
         <Feedback
           feedback={feedback}
           totalFeedback={totalFeedback}
